@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>写真家ポートフォリオ</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="panorama.js"></script>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="nav-container">
+                <div class="logo">
+                    <h1>結城</h1>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="#home">ホーム</a></li>
+                    <li><a href="#gallery360">360°ギャラリー</a></li>
+                    <li><a href="#gallery">フォトギャラリー</a></li>
+                    <li><a href="#about">プロフィール</a></li>
+                    <li><a href="#social">SNS</a></li>
+                    <li><a href="#contact">お問い合わせ</a></li>
+                </ul>
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section id="home" class="hero">
+            <div id="panorama-container"></div>
+            <div class="hero-content">
+                <h2>まるごと“切り撮る”</h2>
+                <p>没入感のある360度写真で、その場にいるような体験をお届けします</p>
+                <div class="cta-buttons">
+                    <a href="#gallery360" class="cta-button">360°ギャラリー</a>
+                    <a href="#gallery" class="cta-button secondary">フォトギャラリー</a>
+                </div>
+                <div class="panorama-controls">
+                    <p class="control-hint">マウスドラッグまたはタッチで360°ビューを操作できます</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="gallery360" class="gallery360">
+            <div class="container">
+                <h2>360°パノラマギャラリー</h2>
+                <p class="gallery360-description">マウスやタッチで自由に視点を変えて、360度の世界をお楽しみください</p>
+                <div class="panorama-gallery">
+                    <div class="panorama-item active" data-panorama="images/IMG_20250612_210438_00_013-2-20250612-3【完成】.jpg">
+                        <div class="panorama-viewer" id="panorama1"></div>
+                        <div class="panorama-info">
+                            <h3>工場夜景</h3>
+                            <p>静寂の中に輝く空間を体験</p>
+                        </div>
+                    </div>
+                    <div class="panorama-item" data-panorama="images/IMG_20250706_123058_00_023-5【完成】.jpg">
+                        <div class="panorama-viewer" id="panorama2"></div>
+                        <div class="panorama-info">
+                            <h3>自然の風景</h3>
+                            <p>美しい自然のパノラマ</p>
+                        </div>
+                    </div>
+                    <div class="panorama-item" data-panorama="images/IMG_20250705_131549_00_002-4【完成】.jpg">
+                        <div class="panorama-viewer" id="panorama3"></div>
+                        <div class="panorama-info">
+                            <h3>歴史的な場所</h3>
+                            <p>神社仏閣など清らかな空気を疑似体験</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="panorama-navigation">
+                    <button class="panorama-nav-btn" data-target="0">1</button>
+                    <button class="panorama-nav-btn" data-target="1">2</button>
+                    <button class="panorama-nav-btn" data-target="2">3</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="streetview" class="streetview-section">
+            <div class="container">
+                <h2>Google ストリートビュー投稿</h2>
+                <p class="streetview-description">三重県内の素晴らしい景色を<br>たくさん投稿しているので<br>ぜひ、のぞいてみてください！</p>
+                <div class="streetview-embed">
+                    <iframe src="https://www.google.com/maps/embed?pb=!4v1752914949622!6m8!1m7!1sCAoSHENJQUJJaERKQ0kwaVg3VDVITDVGSjlMUkdTbHE.!2m2!1d34.99315237963201!2d136.65731292554474!3f0!4f0!5f0.7820865974627469" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                </div>
+            </div>
+        </section>
+
+        <section id="gallery" class="gallery">
+            <div class="container">
+                <h2>作品ギャラリー</h2>
+                <div class="gallery-filter">
+                    <button class="filter-btn active" data-filter="all">すべて</button>
+                    <button class="filter-btn" data-filter="360">360°写真</button>
+                    <button class="filter-btn" data-filter="motorsports">モータースポーツ</button>
+                    <button class="filter-btn" data-filter="landscape">風景</button>
+                </div>
+                <div class="gallery-grid">
+                    <div class="gallery-item" data-category="360" data-panorama="images/IMG_20250705_143255_00_013-4.jpg">
+                        <img src="images/IMG_20250705_143255_00_013-4.jpg" alt="360度写真1" loading="lazy">
+                        <div class="overlay">
+                            <h3>360° 写真 1</h3>
+                            <p>深緑の紅葉の名所</p>
+                            <span class="panorama-indicator">360°</span>
+                        </div>
+                    </div>
+                    <div class="gallery-item" data-category="360" data-panorama="images/IMG_20250712_061416_00_006-5.jpg">
+                        <img src="images/IMG_20250712_061416_00_006-5.jpg" alt="360度写真2" loading="lazy">
+                        <div class="overlay">
+                            <h3>360° 写真 2</h3>
+                            <p>朝焼けの道の分岐点</p>
+                            <span class="panorama-indicator">360°</span>
+                        </div>
+                    </div>
+                    <div class="gallery-item" data-category="motorsports">
+                        <img src="images/_DSC4519-20240719-5【完成】.jpg" alt="モータースポーツ写真1" loading="lazy">
+                        <div class="overlay">
+                            <h3>モータースポーツ写真 1</h3>
+                            <p>ライダーの呼吸を感じて</p>
+                        </div>
+                    </div>
+                    <div class="gallery-item" data-category="landscape">
+                        <img src="images/DSC_068120220215-2.jpg" alt="風景写真1" loading="lazy">
+                        <div class="overlay">
+                            <h3>風景写真 1</h3>
+                            <p>茶畑の緑と愛車の緑</p>
+                        </div>
+                    </div>
+                    <div class="gallery-item" data-category="motorsports">
+                        <img src="images/_DSC8846-20240721-2.jpg" alt="モータースポーツ写真2" loading="lazy">
+                        <div class="overlay">
+                            <h3>モータースポーツ写真 2</h3>
+                            <p>写真でしか見れない刹那の世界</p>
+                        </div>
+                    </div>
+                    <div class="gallery-item" data-category="motorsports">
+                        <img src="images/_DSC2187-NR-20230804-2.jpg" alt="モータースポーツ写真3" loading="lazy">
+                        <div class="overlay">
+                            <h3>モータースポーツ写真3</h3>
+                            <p>サーキットでの白熱のバトル</p>
+                        </div>
+                    </div>
+                    <div class="gallery-item" data-category="360" data-panorama="images/IMG_20250625_082756_00_027-4.jpg">
+                        <img src="images/IMG_20250625_082756_00_027-4.jpg" alt="360度写真3" loading="lazy">
+                        <div class="overlay">
+                            <h3>360° 写真 3</h3>
+                            <p>隠された花園</p>
+                            <span class="panorama-indicator">360°</span>
+                        </div>
+                    </div>
+                    <div class="gallery-item" data-category="landscape">
+                        <img src="images/_DSC2927-20240406-1.jpg" alt="風景写真2" loading="lazy">
+                        <div class="overlay">
+                            <h3>風景写真2</h3>
+                            <p>桜のトンネル</p>
+                        </div>
+                    </div>
+                    <div class="gallery-item" data-category="landscape">
+                        <img src="images/_DSC3847-20240518.jpg" alt="風景写真3" loading="lazy">
+                        <div class="overlay">
+                            <h3>風景写真 3</h3>
+                            <p>奥へ進め</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="about" class="about">
+            <div class="container">
+                <div class="about-content">
+                    <div class="about-text">
+                        <h2>プロフィール</h2>
+                        <p>こんにちは。「全景ポータリスト」の結城と申します。<br>バイクで全国各地をツーリングするうちに、その景色を綺麗に残しておきたくなり、一眼レフカメラを手に取って7年が過ぎました。今は、主に三重県内の景色を中心に撮影しています。</p>
+                        <p>最近では、360°カメラを使用したパノラマ撮影を始め、三重県内の絶景を空間ごと切り取り、従来の写真では表現できない没入感のある作品作りに取り組んでいます。</p>
+                        <p>また、鈴鹿サーキットで開催される「鈴鹿8時間耐久ロードレース」をはじめとしたモータースポーツ写真も大好きです！</p>
+                        <p>360°写真を通じて、見る人がその絶景に入り込んだような体験をお届けしたいと思っています。</p>
+                        <div class="skills">
+                            <h3>専門分野</h3>
+                            <ul>
+                                <li>360度パノラマ写真</li>
+                                <li>風景・自然写真</li>
+                                <li>モータースポーツ写真</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="awards">
+                            <h3>受賞歴</h3>
+                            <ul>
+                                <li>#四日市には港がある Instagramフォトコンテスト(2022) 入選</li>
+                                <li>第4回 #四日市スタイル フォトコンテスト 入選</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="about-image">
+                        <img src="images/プロフィール写真.jpg" alt="結城のプロフィール写真">
+                        <img src="images/結城マカミ.png" alt="結城マカミ" class="second-image">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="social" class="social-links">
+            <div class="container">
+                <h2>FOLLOW ME </h2>
+                <p class="social-description">最新の作品や撮影の様子をSNSで発信しています</p>
+                <div class="social-grid">
+                    <a href="https://x.com/soushi7006" class="social-item" data-platform="twitter" target="_blank" rel="noopener noreferrer">
+                        <div class="social-icon">
+                            <svg viewBox="0 0 24 24" width="24" height="24">
+                                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                            </svg>
+                        </div>
+                        <div class="social-info">
+                            <h3>X (Twitter)</h3>
+                            <p>バイクや旅、生成AIの投稿</p>
+                        </div>
+                    </a>
+                    
+                    <a href="https://www.instagram.com/soushi7006/" class="social-item" data-platform="instagram" target="_blank" rel="noopener noreferrer">
+                        <div class="social-icon">
+                            <svg viewBox="0 0 24 24" width="24" height="24">
+                                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                            </svg>
+                        </div>
+                        <div class="social-info">
+                            <h3>Instagram</h3>
+                            <p>三重県内中心の風景写真とミニブログ</p>
+                        </div>
+                    </a>
+                    
+                    <a href="https://www.threads.com/@soushi7006" class="social-item" data-platform="threads" target="_blank" rel="noopener noreferrer">
+                        <div class="social-icon">
+                            <svg viewBox="0 0 24 24" width="24" height="24">
+                                <path d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.5 12.413 1.5 9.24 2.35 6.386 4.005 4.335 5.855 2.031 8.608.85 12.186.826h.014C15.778.85 18.531 2.031 20.381 4.335 22.036 6.386 22.886 9.24 22.886 12.413c0 3.173-.85 6.027-2.505 8.078-1.85 2.304-4.603 3.485-8.181 3.509zm.014-21.524h-.014C8.943 2.5 6.729 3.477 5.273 5.363 3.948 7.085 3.25 9.563 3.25 12.413s.698 5.328 2.023 7.05C6.729 21.349 8.943 22.326 12.186 22.35h.014c3.243-.024 5.457-1.001 6.913-2.887 1.325-1.722 2.023-4.2 2.023-7.05s-.698-5.328-2.023-7.05C17.657 3.477 15.443 2.5 12.2 2.476z"/>
+                                <path d="M12.2 17.598c-2.87 0-5.2-2.33-5.2-5.2s2.33-5.2 5.2-5.2 5.2 2.33 5.2 5.2-2.33 5.2-5.2 5.2zm0-8.9c-2.04 0-3.7 1.66-3.7 3.7s1.66 3.7 3.7 3.7 3.7-1.66 3.7-3.7-1.66-3.7-3.7-3.7z"/>
+                            </svg>
+                        </div>
+                        <div class="social-info">
+                            <h3>Threads</h3>
+                            <p>360°写真について思ったこと</p>
+                        </div>
+                    </a>
+                    
+                    <a href="https://open.spotify.com/show/0ekxzxBE3GZKK2oW6dKKbK?si=81a4758e2f7a4cf4" class="social-item" data-platform="spotify" target="_blank" rel="noopener noreferrer">
+                        <div class="social-icon">
+                            <svg viewBox="0 0 24 24" width="24" height="24">
+                                <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.42 1.56-.299.421-1.02.599-1.559.3z"/>
+                            </svg>
+                        </div>
+                        <div class="social-info">
+                            <h3>Spotify</h3>
+                            <p>三重県内を散歩しながら語るVodcast</p>
+                        </div>
+                    </a>
+                    
+                    <a href="https://www.youtube.com/@soushi7006" class="social-item" data-platform="youtube" target="_blank" rel="noopener noreferrer">
+                        <div class="social-icon">
+                            <svg viewBox="0 0 24 24" width="24" height="24">
+                                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                            </svg>
+                        </div>
+                        <div class="social-info">
+                            <h3>YouTube</h3>
+                            <p>Spotifyの360°動画版。没入感がすごい！</p>
+                        </div>
+                    </a>
+                    
+                    <a href="https://stand.fm/channels/664f33c6316143a771e7e2cf" class="social-item" data-platform="standFm" target="_blank" rel="noopener noreferrer">
+                        <div class="social-icon">
+                            <svg viewBox="0 0 24 24" width="24" height="24">
+                                <circle cx="12" cy="12" r="3"/>
+                                <path d="M12 1v6M12 17v6M4.22 4.22l4.24 4.24M15.54 15.54l4.24 4.24M1 12h6M17 12h6M4.22 19.78l4.24-4.24M15.54 8.46l4.24-4.24"/>
+                            </svg>
+                        </div>
+                        <div class="social-info">
+                            <h3>stand.fm</h3>
+                            <p>雑談の音声配信。不定期更新</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="contact">
+            <div class="container">
+                <h2>お問い合わせ</h2>
+                <div class="contact-simple">
+                    <div class="contact-message">
+                        
+                        <p>360度パノラマ撮影、風景写真、モータースポーツ撮影などのご依頼やご相談は、<br>以下のSNSのDMでお気軽にお連絡ください。</p>
+                    </div>
+                    
+                    <div class="contact-sns">
+                        <a href="https://x.com/soushi7006" class="contact-sns-item" target="_blank" rel="noopener noreferrer">
+                            <div class="sns-icon">
+                                <svg viewBox="0 0 24 24" width="32" height="32">
+                                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                                </svg>
+                            </div>
+                            <div class="sns-text">
+                                <h4>X (Twitter) DM</h4>
+                               
+                            </div>
+                        </a>
+                        
+                        <a href="https://www.instagram.com/soushi7006/" class="contact-sns-item" target="_blank" rel="noopener noreferrer">
+                            <div class="sns-icon">
+                                <svg viewBox="0 0 24 24" width="32" height="32">
+                                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                                </svg>
+                            </div>
+                            <div class="sns-text">
+                                <h4>Instagram DM</h4>
+                               
+                            </div>
+                        </a>
+                    </div>
+                    
+                    <div class="contact-note">
+                        <p><strong>※ お返事について</strong></p>
+                        <p>通常は24時間2日以内にお返事いたします。お気軽にお声がけください！</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <h3>結城</h3>
+                    <p>全景ポータリスト</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 結城. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <div id="lightbox" class="lightbox">
+        <span class="close">&times;</span>
+        <img class="lightbox-content" src="" alt="">
+        <div class="lightbox-caption"></div>
+        <div class="lightbox-nav">
+            <button class="prev">&#10094;</button>
+            <button class="next">&#10095;</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
