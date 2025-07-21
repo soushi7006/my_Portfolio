@@ -65,154 +65,122 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Lightbox functionality
+    // === 新しいライトボックスと360°写真の処理 START ===
+
     const lightbox = document.getElementById('lightbox');
     const lightboxImg = document.querySelector('.lightbox-content');
     const lightboxCaption = document.querySelector('.lightbox-caption');
-    const closeBtn = document.querySelector('.close');
-    const prevBtn = document.querySelector('.prev');
-    const nextBtn = document.querySelector('.next');
+    const closeBtn = document.querySelector('.lightbox .close');
+    const prevBtn = document.querySelector('.lightbox .prev');
+    const nextBtn = document.querySelector('.lightbox .next');
 
-    let currentImageIndex = 0;
-    let visibleImages = [];
+    let currentVisibleItems = [];
+    let currentIndex = 0;
 
-    function updateVisibleImages() {
-        visibleImages = Array.from(document.querySelectorAll('.gallery-item'))
-            .filter(item => item.style.display !== 'none')
-            .map(item => ({
-                src: item.querySelector('img').src,
-                title: item.querySelector('.overlay h3').textContent,
-                description: item.querySelector('.overlay p').textContent
-            }));
+    // 表示されているアイテム（フィルタリング後）のリストを更新する関数
+    function updateVisibleItems() {
+        currentVisibleItems = Array.from(galleryItems).filter(item => item.style.display !== 'none');
     }
 
-    function showLightbox(index) {
-        updateVisibleImages();
-        currentImageIndex = index;
-        const image = visibleImages[currentImageIndex];
+    // ライトボックスを開く関数
+    function openLightbox(item) {
+        updateVisibleItems();
+        currentIndex = currentVisibleItems.indexOf(item);
         
-        lightboxImg.src = image.src;
-        lightboxCaption.innerHTML = `<h3>${image.title}</h3><p>${image.description}</p>`;
+        const imgSrc = item.querySelector('img').src;
+        const title = item.querySelector('.overlay h3')?.textContent || '';
+        const description = item.querySelector('.overlay p')?.textContent || '';
+        
+        lightboxImg.src = imgSrc;
+        lightboxCaption.innerHTML = `<h3>${title}</h3><p>${description}</p>`;
+        
         lightbox.style.display = 'block';
         document.body.style.overflow = 'hidden';
     }
 
+    // 360°ビューワーをフルスクリーンで開く関数
+    function openPanorama(item) {
+        const imageUrl = item.getAttribute('data-panorama');
+        if (!imageUrl) return;
+
+        const fullscreenDiv = document.createElement('div');
+        fullscreenDiv.className = 'panorama-fullscreen';
+        fullscreenDiv.id = 'gallery-panorama-fullscreen';
+
+        const closeButton = document.createElement('button');
+        closeButton.className = 'close-fullscreen-btn';
+        closeButton.textContent = '✕ 閉じる';
+        closeButton.onclick = () => {
+            document.body.removeChild(fullscreenDiv);
+            document.body.style.overflow = 'auto';
+        };
+
+        fullscreenDiv.appendChild(closeButton);
+        document.body.appendChild(fullscreenDiv);
+        document.body.style.overflow = 'hidden';
+        
+        new PanoramaViewer('gallery-panorama-fullscreen', imageUrl);
+    }
+
+    // ライトボックスを閉じる関数
     function closeLightbox() {
         lightbox.style.display = 'none';
         document.body.style.overflow = 'auto';
     }
 
-    function showPrevImage() {
-        currentImageIndex = currentImageIndex > 0 ? currentImageIndex - 1 : visibleImages.length - 1;
-        const image = visibleImages[currentImageIndex];
-        lightboxImg.src = image.src;
-        lightboxCaption.innerHTML = `<h3>${image.title}</h3><p>${image.description}</p>`;
+    // 次の画像を表示する関数
+    function showNext() {
+        currentIndex = (currentIndex + 1) % currentVisibleItems.length;
+        const nextItem = currentVisibleItems[currentIndex];
+        const imgSrc = nextItem.querySelector('img').src;
+        const title = nextItem.querySelector('.overlay h3')?.textContent || '';
+        const description = nextItem.querySelector('.overlay p')?.textContent || '';
+        lightboxImg.src = imgSrc;
+        lightboxCaption.innerHTML = `<h3>${title}</h3><p>${description}</p>`;
     }
 
-    function showNextImage() {
-        currentImageIndex = currentImageIndex < visibleImages.length - 1 ? currentImageIndex + 1 : 0;
-        const image = visibleImages[currentImageIndex];
-        lightboxImg.src = image.src;
-        lightboxCaption.innerHTML = `<h3>${image.title}</h3><p>${image.description}</p>`;
+    // 前の画像を表示する関数
+    function showPrev() {
+        currentIndex = (currentIndex - 1 + currentVisibleItems.length) % currentVisibleItems.length;
+        const prevItem = currentVisibleItems[currentIndex];
+        const imgSrc = prevItem.querySelector('img').src;
+        const title = prevItem.querySelector('.overlay h3')?.textContent || '';
+        const description = prevItem.querySelector('.overlay p')?.textContent || '';
+        lightboxImg.src = imgSrc;
+        lightboxCaption.innerHTML = `<h3>${title}</h3><p>${description}</p>`;
     }
 
-    // Add click event to gallery images
-    galleryItems.forEach((item, index) => {
+    // 各ギャラリーアイテムにクリックイベントを設定
+    galleryItems.forEach(item => {
         item.addEventListener('click', () => {
-            // Check if this is a 360 panorama item
-            const panoramaData = item.getAttribute('data-panorama');
-            if (panoramaData) {
-                // Show 360 panorama viewer
-                show360Panorama(panoramaData);
+            if (item.hasAttribute('data-panorama')) {
+                openPanorama(item);
             } else {
-                // Show regular lightbox
-                const visibleIndex = Array.from(document.querySelectorAll('.gallery-item'))
-                    .filter(i => i.style.display !== 'none')
-                    .indexOf(item);
-                showLightbox(visibleIndex);
+                openLightbox(item);
             }
         });
     });
 
-    // Lightbox controls
-    closeBtn.addEventListener('click', closeLightbox);
-    prevBtn.addEventListener('click', showPrevImage);
-    nextBtn.addEventListener('click', showNextImage);
+    // ライトボックスの操作イベント
+    if (closeBtn) closeBtn.addEventListener('click', closeLightbox);
+    if (nextBtn) nextBtn.addEventListener('click', showNext);
+    if (prevBtn) prevBtn.addEventListener('click', showPrev);
 
-    // Close lightbox when clicking outside the image
     lightbox.addEventListener('click', (e) => {
         if (e.target === lightbox) {
             closeLightbox();
         }
     });
 
-    // Keyboard navigation for lightbox
     document.addEventListener('keydown', (e) => {
         if (lightbox.style.display === 'block') {
-            switch(e.key) {
-                case 'Escape':
-                    closeLightbox();
-                    break;
-                case 'ArrowLeft':
-                    showPrevImage();
-                    break;
-                case 'ArrowRight':
-                    showNextImage();
-                    break;
-            }
+            if (e.key === 'ArrowRight') showNext();
+            if (e.key === 'ArrowLeft') showPrev();
+            if (e.key === 'Escape') closeLightbox();
         }
     });
 
-    // 360 Panorama viewer function
-    function show360Panorama(imageUrl) {
-        // Create fullscreen panorama viewer
-        const fullscreenDiv = document.createElement('div');
-        fullscreenDiv.className = 'panorama-fullscreen';
-        fullscreenDiv.id = 'gallery-panorama-fullscreen';
-        
-        const controlsDiv = document.createElement('div');
-        controlsDiv.className = 'fullscreen-controls';
-        
-        const closeBtn = document.createElement('button');
-        closeBtn.className = 'close-fullscreen-btn';
-        closeBtn.textContent = '✕ 閉じる';
-        closeBtn.onclick = () => close360Panorama();
-        
-        controlsDiv.appendChild(closeBtn);
-        fullscreenDiv.appendChild(controlsDiv);
-        document.body.appendChild(fullscreenDiv);
-        
-        // Create 360 panorama viewer
-        const viewer = new PanoramaViewer('gallery-panorama-fullscreen');
-        viewer.loadPanorama(imageUrl);
-        
-        // Store viewer reference for cleanup
-        fullscreenDiv.panoramaViewer = viewer;
-        
-        // ESC key to close
-        const escapeHandler = (e) => {
-            if (e.key === 'Escape') {
-                close360Panorama();
-                document.removeEventListener('keydown', escapeHandler);
-            }
-        };
-        document.addEventListener('keydown', escapeHandler);
-        
-        // Prevent body scroll
-        document.body.style.overflow = 'hidden';
-    }
-
-    function close360Panorama() {
-        const fullscreenDiv = document.getElementById('gallery-panorama-fullscreen');
-        if (fullscreenDiv) {
-            // Clean up panorama viewer
-            if (fullscreenDiv.panoramaViewer) {
-                fullscreenDiv.panoramaViewer.destroy();
-            }
-            document.body.removeChild(fullscreenDiv);
-            document.body.style.overflow = 'auto';
-        }
-    }
+    // === 新しいライトボックスと360°写真の処理 END ===
 
     // Contact form handling
     const contactForm = document.querySelector('.contact-form');
