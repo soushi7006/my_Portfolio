@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>フォトギャラリー - 写真家ポートフォリオ</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="panorama.js"></script>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="nav-container">
+                <div class="logo">
+                    <h1><a href="index.html" style="text-decoration: none; color: inherit;">結城</a></h1>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="index.html#home">ホーム</a></li>
+                    <li><a href="index.html#gallery360">360°ギャラリー</a></li>
+                    <li><a href="gallery.html" class="active">フォトギャラリー</a></li>
+                    <li><a href="index.html#about">プロフィール</a></li>
+                    <li><a href="index.html#social">SNS</a></li>
+                    <li><a href="index.html#contact">お問い合わせ</a></li>
+                </ul>
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="gallery gallery-page">
+            <div class="container">
+                <div class="page-header">
+                    <h1>フォトギャラリー</h1>
+                    <p>360度写真、モータースポーツ、風景写真の作品をご覧ください</p>
+                </div>
+                
+                <div class="gallery-filter">
+                    <button class="filter-btn active" data-filter="all">すべて</button>
+                    <button class="filter-btn" data-filter="360">360°写真</button>
+                    <button class="filter-btn" data-filter="motorsports">モータースポーツ</button>
+                    <button class="filter-btn" data-filter="landscape">風景</button>
+                </div>
+                
+                <div class="gallery-grid">
+                    <div class="gallery-item" data-category="360" data-panorama="images/IMG_20250705_143255_00_013-4.jpg">
+                        <img src="images/IMG_20250705_143255_00_013-4.jpg" alt="360度写真1" loading="lazy">
+                        <div class="overlay">
+                            <h3>360° 写真 1</h3>
+                            <p>深緑の紅葉の名所</p>
+                            <span class="panorama-indicator">360°</span>
+                        </div>
+                    </div>
+                    <div class="gallery-item" data-category="360" data-panorama="images/IMG_20250712_061416_00_006-5.jpg">
+                        <img src="images/IMG_20250712_061416_00_006-5.jpg" alt="360度写真2" loading="lazy">
+                        <div class="overlay">
+                            <h3>360° 写真 2</h3>
+                            <p>朝焼けの道の分岐点</p>
+                            <span class="panorama-indicator">360°</span>
+                        </div>
+                    </div>
+                    <div class="gallery-item" data-category="motorsports">
+                        <img src="images/_DSC4519-20240719-5.jpg" alt="モータースポーツ写真1" loading="lazy">
+                        <div class="overlay">
+                            <h3>モータースポーツ写真 1</h3>
+                            <p>ライダーの呼吸を感じて</p>
+                        </div>
+                    </div>
+                    <div class="gallery-item" data-category="landscape">
+                        <img src="images/DSC_068120220215-2.jpg" alt="風景写真1" loading="lazy">
+                        <div class="overlay">
+                            <h3>風景写真 1</h3>
+                            <p>茶畑の緑と愛車の緑</p>
+                        </div>
+                    </div>
+                    <div class="gallery-item" data-category="motorsports">
+                        <img src="images/_DSC8846-20240721-2.jpg" alt="モータースポーツ写真2" loading="lazy">
+                        <div class="overlay">
+                            <h3>モータースポーツ写真 2</h3>
+                            <p>写真でしか見れない刹那の世界</p>
+                        </div>
+                    </div>
+                    <div class="gallery-item" data-category="motorsports">
+                        <img src="images/_DSC2187-NR-20230804-2.jpg" alt="モータースポーツ写真3" loading="lazy">
+                        <div class="overlay">
+                            <h3>モータースポーツ写真3</h3>
+                            <p>サーキットでの白熱のバトル</p>
+                        </div>
+                    </div>
+                    <div class="gallery-item" data-category="360" data-panorama="images/IMG_20250625_082756_00_027-4.jpg">
+                        <img src="images/IMG_20250625_082756_00_027-4.jpg" alt="360度写真3" loading="lazy">
+                        <div class="overlay">
+                            <h3>360° 写真 3</h3>
+                            <p>隠された花園</p>
+                            <span class="panorama-indicator">360°</span>
+                        </div>
+                    </div>
+                    <div class="gallery-item" data-category="landscape">
+                        <img src="images/_DSC2927-20240406-1.jpg" alt="風景写真2" loading="lazy">
+                        <div class="overlay">
+                            <h3>風景写真2</h3>
+                            <p>桜のトンネル</p>
+                        </div>
+                    </div>
+                    <div class="gallery-item" data-category="landscape">
+                        <img src="images/_DSC3847-20240518.jpg" alt="風景写真3" loading="lazy">
+                        <div class="overlay">
+                            <h3>風景写真 3</h3>
+                            <p>奥へ進め</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Lightbox -->
+    <div id="lightbox" class="lightbox">
+        <span class="close">&times;</span>
+        <img class="lightbox-content" src="" alt="">
+        <div class="lightbox-caption"></div>
+        <a class="prev">&#10094;</a>
+        <a class="next">&#10095;</a>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
