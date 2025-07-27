@@ -1282,15 +1282,3 @@ html {
     scroll-behavior: smooth;
 }
 
-/* Loading animation for images */
-img {
-    transition: opacity 0.3s ease;
-}
-
-img[loading="lazy"] {
-    opacity: 0;
-}
-
-img[loading="lazy"].loaded {
-    opacity: 1;
-}
