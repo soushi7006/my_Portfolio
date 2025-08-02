@@ -6,7 +6,8 @@
       "Bash(git add:*)",
       "Bash(git remote add:*)",
       "Bash(git push:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(dir \"C:\\Users\\hao\\vibe開発\\xx_ホームページ制作\")"
     ],
     "deny": []
   }
