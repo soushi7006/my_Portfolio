@@ -5,147 +5,193 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>結城／全景ポータリスト</title>
     
-    <!-- OGP設定 -->
     <meta property="og:title" content="結城／全景ポータリスト">
     <meta property="og:description" content="没入感のある360度写真で、その場にいるような体験をお届けします。結城のポートフォリオサイト。">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://soushi7006.github.io/my_Portfolio/index.html">
-    <meta property="og:image" content="https://soushi7006.github.io/my_Portfolio/images/IMG_20250612_210438_00_013-2-20250612-3【完成】.jpg">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-    <meta property="og:site_name" content="結城／全景ポータリスト">
-    <meta property="og:locale" content="ja_JP">
-    
-    <!-- Twitter Card設定 -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:site" content="@soushi7006">
-    <meta name="twitter:creator" content="@soushi7006">
-    <meta name="twitter:title" content="結城／全景ポータリスト">
-    <meta name="twitter:description" content="没入感のある360度写真で、その場にいるような体験をお届けします。三重県を中心とした風景写真・モータースポーツ写真を手がける全景ポータリスト結城のポートフォリオサイト。">
-    <meta name="twitter:image" content="https://soushi7006.github.io/my_Portfolio/images/IMG_20250706_113936_00_011-4-SS.jpg">
     
     <link rel="icon" href="data:,">
-    <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@300;400;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="panorama.js"></script>
+
+    <style>
+        /* ▼▼▼ フォントと基本設定 ▼▼▼ */
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500&family=Noto+Sans+JP:wght@300;400;700&display=swap');
+
+        :root {
+            --base-bg: #000000;
+            --content-bg: #111;
+            --text-main: #e0e0e0;
+            --crystal-border: #E7F0FF;
+            --neon-blue: #00e1ff;
+            --neon-yellow: #fff700;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background-color: var(--base-bg);
+            color: var(--text-main);
+            overflow-x: hidden;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        
+        /* ▼▼▼ ローディングアニメーション ▼▼▼ */
+        .loader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--base-bg); display: flex;
+            justify-content: center; align-items: center; z-index: 9999;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+        .loader.hidden { opacity: 0; visibility: hidden; }
+        .loader-logo {
+            font-family: 'Orbitron', sans-serif; font-size: 2rem; color: #fff;
+            overflow: hidden; white-space: nowrap; border-right: .15em solid var(--crystal-border);
+            animation: typing 2s steps(4, end), blink-caret .75s step-end infinite;
+        }
+        @keyframes typing { from { width: 0 } to { width: 100% } }
+        @keyframes blink-caret { from, to { border-color: transparent } 50% { border-color: var(--crystal-border); } }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        h1, h2, h3, h4 { font-family: 'Rajdhani', sans-serif; font-weight: 500; color: #ffffff; }
+        section { padding: 120px 0; position: relative; z-index: 1; }
+
+        .reveal { opacity: 0; transform: translateY(30px); transition: opacity 1s ease, transform 1s ease; }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+
+        /* Header */
+        header {
+            position: fixed; top: 0; width: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+        }
+        .nav-container { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; }
+        .logo h1 { font-family: 'Orbitron', sans-serif; font-size: 1.8rem; }
+        .nav-menu { display: flex; list-style: none; gap: 2rem; }
+        .nav-menu a { color: var(--text-main); text-decoration: none; transition: all 0.3s ease; }
+        .nav-menu a:hover { color: var(--crystal-border); text-shadow: 0 0 8px var(--crystal-border); }
+
+        /* Hero Section */
+        .hero { height: 100vh; position: relative; display: flex; align-items: center; justify-content: center; text-align: center; }
+        #panorama-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; filter: brightness(0.6); }
+        .hero-content h2 { font-family: 'Orbitron', sans-serif; font-size: 3.5rem; text-shadow: 0 0 10px rgba(231, 240, 255, 0.7); }
+        .hero-content p { font-size: 1.2rem; margin-top: 1rem; }
+
+        /* クリスタル・フレーム共通スタイル */
+        .crystal-frame {
+            background: rgba(0,0,0,0.5);
+            border: 2px solid var(--crystal-border);
+            box-shadow: 0 0 20px rgba(231, 240, 255, 0.3), inset 0 0 15px rgba(231, 240, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .crystal-frame:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 10px 40px rgba(231, 240, 255, 0.5), inset 0 0 20px rgba(231, 240, 255, 0.3);
+        }
+        /* ネオンエフェクト共通スタイル */
+        .crystal-frame::before, .crystal-frame::after {
+            content: ''; position: absolute; width: 150%; height: 3px;
+            pointer-events: none; filter: drop-shadow(0 0 5px currentColor);
+        }
+        .crystal-frame::before {
+            background: linear-gradient(to right, transparent, var(--neon-blue), transparent);
+            color: var(--neon-blue); top: 0; left: 0;
+            transform: translateX(-100%);
+            transition: transform 0.7s cubic-bezier(0.7, 0, 0.3, 1);
+        }
+        .crystal-frame:hover::before { transform: translateX(100%); }
+        .crystal-frame::after {
+            background: linear-gradient(to left, transparent, var(--neon-yellow), transparent);
+            color: var(--neon-yellow); bottom: 0; right: 0;
+            transform: translateX(100%);
+            transition: transform 0.7s cubic-bezier(0.7, 0, 0.3, 1);
+        }
+        .crystal-frame:hover::after { transform: translateX(-100%); }
+
+        /* Gallery Section */
+        .gallery360 h2 { text-align: center; font-size: 2.8rem; margin-bottom: 4rem; }
+        .panorama-gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2.5rem; }
+        .panorama-item { padding: 1rem; }
+        .panorama-viewer { width: 100%; height: 250px; }
+        .panorama-info { padding: 1.5rem 0 0; text-align: center; }
+        .panorama-info h3 { font-size: 1.8rem; }
+
+        /* About Section */
+        .about-content { display: grid; grid-template-columns: 2fr 1fr; gap: 4rem; align-items: center; }
+        .about-text h2 { font-size: 2.8rem; margin-bottom: 2rem; }
+        .about-image { display: flex; flex-direction: column; gap: 1.5rem; }
+        .about-image img { width: 100%; display: block; }
+
+        /* Social Links */
+        .social-links h2 { text-align: center; font-size: 2.8rem; margin-bottom: 4rem; }
+        .social-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; }
+        .social-item { padding: 1.5rem; text-decoration: none; color: var(--text-main); display: flex; align-items: center; gap: 1.5rem; }
+        .social-icon img { width: 60px; height: 60px; border-radius: 5px; }
+
+        /* Contact */
+        .contact { text-align: center; }
+        .contact h2 { font-size: 2.8rem; margin-bottom: 2rem; }
+        .contact-sns-item { display: inline-block; text-decoration: none; color: var(--crystal-border); border: 1px solid var(--crystal-border); padding: 1rem 2rem; margin: 1rem; border-radius: 50px; transition: all 0.3s ease; }
+        .contact-sns-item:hover { background: var(--crystal-border); color: var(--base-bg); box-shadow: 0 0 20px var(--crystal-border); }
+
+        footer { text-align: center; color: #777; border-top: 1px solid #333; padding-top: 4rem; }
+    </style>
 </head>
 <body>
+
+    <div class="loader"><div class="loader-logo">結城</div></div>
+
     <header>
-        <nav>
-            <div class="nav-container">
-                <div class="logo">
-                    <h1>結城</h1>
-                </div>
-                <ul class="nav-menu">
-                    <li><a href="#home">ホーム</a></li>
-                    <li><a href="#gallery360">360°ギャラリー</a></li>
-                    <li><a href="gallery.html">フォトギャラリー</a></li>
-                    <li><a href="#about">プロフィール</a></li>
-                    <li><a href="#social">SNS</a></li>
-                    <li><a href="#contact">お問い合わせ</a></li>
-                </ul>
-                <div class="hamburger">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
-            </div>
+        <nav class="container">
+            <div class="logo"><h1>結城</h1></div>
+            <ul class="nav-menu">
+                <li><a href="#home">ホーム</a></li>
+                <li><a href="#gallery360">360°ギャラリー</a></li>
+                <li><a href="gallery.html">フォトギャラリー</a></li>
+                <li><a href="#about">プロフィール</a></li>
+                <li><a href="#social">SNS</a></li>
+                <li><a href="#contact">お問い合わせ</a></li>
+            </ul>
         </nav>
     </header>
 
     <main>
         <section id="home" class="hero">
             <div id="panorama-container"></div>
-            <div class="hero-content">
+            <div class="hero-content reveal">
                 <h2>まるごと“切り撮る”</h2>
-                <p>没入感のある360度写真で、その場にいるような体験をお届けします</p>
-                <div class="cta-buttons">
-                    <a href="#gallery360" class="cta-button">360°ギャラリー</a>
-                    <a href="gallery.html" class="cta-button secondary">フォトギャラリー</a>
-                </div>
-                <div class="panorama-controls">
-                    <p class="control-hint">マウスドラッグまたはタッチで360°ビューを操作できます</p>
-                </div>
+                <p>没入感のある360度写真で、その場にいるような体験を</p>
             </div>
         </section>
 
         <section id="gallery360" class="gallery360">
             <div class="container">
-                <h2>360°パノラマギャラリー</h2>
-                <p class="gallery360-description">マウスやタッチで自由に視点を変えて、360度の世界をお楽しみください</p>
+                <h2 class="reveal">360° PANORAMA GALLERY</h2>
                 <div class="panorama-gallery">
-                    <div class="panorama-item active" data-panorama="images/IMG_20250727_042105_00_003-4end.jpg">
-                        <div class="panorama-viewer" id="panorama1"></div>
-                        <div class="panorama-info">
-                            <h3>工場夜景</h3>
-                            <p>静寂の中に輝く空間を体験</p>
-                        </div>
-                    </div>
-                    <div class="panorama-item" data-panorama="images/IMG_20250706_123058_00_023-5【完成】.jpg">
-                        <div class="panorama-viewer" id="panorama2"></div>
-                        <div class="panorama-info">
-                            <h3>自然の風景</h3>
-                            <p>美しい自然のパノラマ</p>
-                        </div>
-                    </div>
-                    <div class="panorama-item" data-panorama="images/IMG_20250705_131549_00_002-4【完成】.jpg">
-                        <div class="panorama-viewer" id="panorama3"></div>
-                        <div class="panorama-info">
-                            <h3>歴史的な場所</h3>
-                            <p>神社仏閣など清らかな空気を疑似体験</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="panorama-navigation">
-                    <button class="panorama-nav-btn" data-target="0">1</button>
-                    <button class="panorama-nav-btn" data-target="1">2</button>
-                    <button class="panorama-nav-btn" data-target="2">3</button>
+                    <div class="panorama-item crystal-frame reveal"><div class="panorama-viewer" id="panorama1"></div><div class="panorama-info"><h3>工場夜景</h3></div></div>
+                    <div class="panorama-item crystal-frame reveal"><div class="panorama-viewer" id="panorama2"></div><div class="panorama-info"><h3>自然の風景</h3></div></div>
+                    <div class="panorama-item crystal-frame reveal"><div class="panorama-viewer" id="panorama3"></div><div class="panorama-info"><h3>歴史的な場所</h3></div></div>
                 </div>
             </div>
         </section>
-
-        <section id="streetview" class="streetview-section">
-            <div class="container">
-                <h2>Google ストリートビュー投稿</h2>
-                <p class="streetview-description">三重県内の素晴らしい景色を<br>たくさん投稿しているので<br>ぜひ、のぞいてみてください！</p>
-                <div class="streetview-embed">
-                    <iframe src="https://www.google.com/maps/embed?pb=!4v1752914949622!6m8!1m7!1sCAoSHENJQUJJaERKQ0kwaVg3VDVITDVGSjlMUkdTbHE.!2m2!1d34.99315237963201!2d136.65731292554474!3f0!4f0!5f0.7820865974627469" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-                </div>
-            </div>
-        </section>
-
-
+        
         <section id="about" class="about">
             <div class="container">
                 <div class="about-content">
-                    <div class="about-text">
-                        <h2>プロフィール</h2>
+                    <div class="about-text reveal">
+                        <h2>PROFILE</h2>
                         <p>こんにちは。景色を空間ごと切り取る「全景ポータリスト」、結城と申します。<br>バイクで全国を旅する中で、心に残る景色を美しく記録したいという想いからデジタル一眼レフを始め、撮影を8年続けています。現在は、主に地元・三重県の風景を中心に活動しています。</p>
                         <p>最近では360°カメラによるパノラマ撮影に力を入れています。三重の絶景を空間ごと切り取り、見る人がその場に入り込んだような没入感のある作品作りが目標です。</p>
-                        <p>また、鈴鹿サーキットで開催される「鈴鹿8耐」をはじめ、モータースポーツの撮影も情熱を注いでいる大切なテーマです。</p>
-                        <div class="skills">
-                            <h3>専門分野</h3>
-                            <ul>
-                                <li>360度パノラマ写真</li>
-                                <li>風景・自然写真</li>
-                                <li>モータースポーツ写真</li>
-                            </ul>
-                        </div>
-                        
-                        <div class="awards">
-                            <h3>受賞歴</h3>
-                            <ul>
-                                <li>#四日市には港がある Instagramフォトコンテスト(2022) 入選</li>
-                                <li>第4回 #四日市スタイル フォトコンテスト 入選</li>
-                            </ul>
-                        </div>
                     </div>
                     <div class="about-image">
-                        <img src="images/プロフィール写真.jpg" alt="結城のプロフィール写真">
-                        <img src="images/結城マカミ.png" alt="結城マカミ" class="second-image">
+                        <img src="images/プロフィール写真.jpg" alt="結城のプロフィール写真" class="crystal-frame reveal">
+                        <img src="images/結城マカミ.png" alt="結城マカミ" class="crystal-frame reveal">
                     </div>
                 </div>
             </div>
@@ -153,110 +199,26 @@
 
         <section id="social" class="social-links">
             <div class="container">
-                <h2>FOLLOW ME </h2>
-                <p class="social-description">最新の作品や撮影の様子をSNSで発信しています</p>
+                <h2 class="reveal">FOLLOW ME</h2>
                 <div class="social-grid">
-                    <a href="https://x.com/soushi7006" class="social-item" data-platform="twitter" target="_blank" rel="noopener noreferrer">
-                        <div class="social-icon">
-                            <img src="images/ChatGPT Image 2025年8月2日 15_35_39Twitter2.png" alt="X (Twitter)" class="icon-image">
-                        </div>
-                        <div class="social-info">
-                            <h3>X (Twitter)</h3>
-                            <p>バイクや旅、生成AIの投稿</p>
-                        </div>
-                    </a>
-                    
-                    <a href="https://www.instagram.com/soushi7006/" class="social-item" data-platform="instagram" target="_blank" rel="noopener noreferrer">
-                        <div class="social-icon">
-                            <img src="images/ChatGPT Image 2025年8月2日 13_06_51Instagram2.png" alt="Instagram" class="icon-image">
-                        </div>
-                        <div class="social-info">
-                            <h3>Instagram</h3>
-                            <p>三重県内中心の風景写真とミニブログ</p>
-                        </div>
-                    </a>
-                    
-                    <a href="https://www.threads.com/@soushi7006" class="social-item" data-platform="threads" target="_blank" rel="noopener noreferrer">
-                        <div class="social-icon">
-                            <img src="images/ChatGPT Image 2025年8月2日 15_42_52Threads2.png" alt="Threads" class="icon-image">
-                        </div>
-                        <div class="social-info">
-                            <h3>Threads</h3>
-                            <p>360°写真について思ったこと</p>
-                        </div>
-                    </a>
-                    
-                    <a href="https://open.spotify.com/show/0ekxzxBE3GZKK2oW6dKKbK?si=81a4758e2f7a4cf4" class="social-item" data-platform="spotify" target="_blank" rel="noopener noreferrer">
-                        <div class="social-icon">
-                            <img src="images/ChatGPT Image 2025年8月2日 15_40_42Spotify2.png" alt="Spotify" class="icon-image">
-                        </div>
-                        <div class="social-info">
-                            <h3>Spotify</h3>
-                            <p>三重県内を散歩しながら語るVodcast</p>
-                        </div>
-                    </a>
-                    
-                    <a href="https://www.youtube.com/@soushi7006" class="social-item" data-platform="youtube" target="_blank" rel="noopener noreferrer">
-                        <div class="social-icon">
-                            <img src="images/ChatGPT Image 2025年8月2日 13_10_40YouTube2.png" alt="YouTube" class="icon-image">
-                        </div>
-                        <div class="social-info">
-                            <h3>YouTube</h3>
-                            <p>Spotifyの360°動画版。没入感がすごい！</p>
-                        </div>
-                    </a>
-                    
-                    <a href="https://stand.fm/channels/664f33c6316143a771e7e2cf" class="social-item" data-platform="standFm" target="_blank" rel="noopener noreferrer">
-                        <div class="social-icon">
-                            <img src="images/ChatGPT Image 2025年8月2日 13_02_31standfm2.png" alt="stand.fm" class="icon-image">
-                        </div>
-                        <div class="social-info">
-                            <h3>stand.fm</h3>
-                            <p>雑談の音声配信。不定期更新</p>
-                        </div>
-                    </a>
+                    <a href="https://x.com/soushi7006" class="social-item crystal-frame reveal" target="_blank" rel="noopener noreferrer"><div class="social-icon"><img src="images/ChatGPT Image 2025年8月2日 15_35_39Twitter2.png" alt="X"></div><div><h3>X (Twitter)</h3><p>バイクや旅、生成AIの投稿</p></div></a>
+                    <a href="https://www.instagram.com/soushi7006/" class="social-item crystal-frame reveal" target="_blank" rel="noopener noreferrer"><div class="social-icon"><img src="images/ChatGPT Image 2025年8月2日 13_06_51Instagram2.png" alt="Instagram"></div><div><h3>Instagram</h3><p>三重県内中心の風景写真とミニブログ</p></div></a>
+                    <a href="https://www.threads.com/@soushi7006" class="social-item crystal-frame reveal" target="_blank" rel="noopener noreferrer"><div class="social-icon"><img src="images/ChatGPT Image 2025年8月2日 15_42_52Threads2.png" alt="Threads"></div><div><h3>Threads</h3><p>360°写真について思ったこと</p></div></a>
+                    <a href="https://open.spotify.com/show/0ekxzxBE3GZKK2oW6dKKbK?si=81a4758e2f7a4cf4" class="social-item crystal-frame reveal" target="_blank" rel="noopener noreferrer"><div class="social-icon"><img src="images/ChatGPT Image 2025年8月2日 15_40_42Spotify2.png" alt="Spotify"></div><div><h3>Spotify</h3><p>三重県内を散歩しながら語るVodcast</p></div></a>
+                    <a href="https://www.youtube.com/@soushi7006" class="social-item crystal-frame reveal" target="_blank" rel="noopener noreferrer"><div class="social-icon"><img src="images/ChatGPT Image 2025年8月2日 13_10_40YouTube2.png" alt="YouTube"></div><div><h3>YouTube</h3><p>Spotifyの360°動画版。没入感がすごい！</p></div></a>
+                    <a href="https://stand.fm/channels/664f33c6316143a771e7e2cf" class="social-item crystal-frame reveal" target="_blank" rel="noopener noreferrer"><div class="social-icon"><img src="images/ChatGPT Image 2025年8月2日 13_02_31standfm2.png" alt="stand.fm"></div><div><h3>stand.fm</h3><p>雑談の音声配信。不定期更新</p></div></a>
                 </div>
             </div>
         </section>
-
-        <section id="contact" class="contact">
+        
+        <section id="contact" class="contact reveal">
             <div class="container">
-                <h2>お問い合わせ</h2>
-                <div class="contact-simple">
-                    <div class="contact-message">
-                        
-                        <p>360度パノラマ撮影、風景写真、モータースポーツ撮影などのご依頼やご相談は、<br>以下のSNSのDMでお気軽にお連絡ください。</p>
-                    </div>
-                    
-                    <div class="contact-sns">
-                        <a href="https://x.com/soushi7006" class="contact-sns-item" target="_blank" rel="noopener noreferrer">
-                            <div class="sns-icon">
-                                <svg viewBox="0 0 24 24" width="32" height="32">
-                                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                                </svg>
-                            </div>
-                            <div class="sns-text">
-                                <h4>X (Twitter) DM</h4>
-                               
-                            </div>
-                        </a>
-                        
-                        <a href="https://www.instagram.com/soushi7006/" class="contact-sns-item" target="_blank" rel="noopener noreferrer">
-                            <div class="sns-icon">
-                                <svg viewBox="0 0 24 24" width="32" height="32">
-                                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                                </svg>
-                            </div>
-                            <div class="sns-text">
-                                <h4>Instagram DM</h4>
-                               
-                            </div>
-                        </a>
-                    </div>
-                    
-                    <div class="contact-note">
-                        <p><strong>※ お返事について</strong></p>
-                        <p>通常は24時間2日以内にお返事いたします。お気軽にお声がけください！</p>
+                <h2>CONTACT</h2>
+                <div class="contact-message">
+                    <p>撮影のご依頼やご相談は、SNSのDMにてお気軽にご連絡ください。</p>
+                    <div>
+                        <a href="https://x.com/soushi7006" class="contact-sns-item" target="_blank" rel="noopener noreferrer">X (Twitter)</a>
+                        <a href="https://www.instagram.com/soushi7006/" class="contact-sns-item" target="_blank" rel="noopener noreferrer">Instagram</a>
                     </div>
                 </div>
             </div>
@@ -264,29 +226,61 @@
     </main>
 
     <footer>
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-info">
-                    <h3>結城</h3>
-                    <p>全景ポータリスト</p>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2025 結城. All rights reserved.</p>
-            </div>
-        </div>
+        <div class="container"><p>© 2025 結城. All rights reserved.</p></div>
     </footer>
 
-    <div id="lightbox" class="lightbox">
-        <span class="close">&times;</span>
-        <img class="lightbox-content" src="" alt="">
-        <div class="lightbox-caption"></div>
-        <div class="lightbox-nav">
-            <button class="prev">&#10094;</button>
-            <button class="next">&#10095;</button>
-        </div>
-    </div>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Panorama setup
+        if (typeof PanoramaManager !== 'undefined') {
+            const panoramaManager = new PanoramaManager();
+            panoramaManager.initHeroPanorama = function() {
+                if (!document.getElementById('panorama-container')) return;
+                this.currentHeroPanorama = this.createViewer('panorama-container', 'images/IMG_20250607_210405_00_013-4【完成】.jpg');
+                if(this.currentHeroPanorama) {
+                    this.currentHeroPanorama.lon = 180;
+                    this.currentHeroPanorama.startAutoRotation(0.05);
+                }
+            };
+            
+            panoramaManager.initGalleryPanoramas = function() {
+                const galleryItems = document.querySelectorAll('.panorama-item');
+                const panoramaImages = [
+                    'images/IMG_20250727_042105_00_003-4end.jpg',
+                    'images/IMG_20250706_123058_00_023-5【完成】.jpg',
+                    'images/IMG_20250705_131549_00_002-4【完成】.jpg'
+                ];
+                galleryItems.forEach((item, index) => {
+                    const viewerId = item.querySelector('.panorama-viewer').id;
+                    if (viewerId && panoramaImages[index]) {
+                        const viewer = this.createViewer(viewerId, panoramaImages[index]);
+                        if (viewer) viewer.lon = 180;
+                    }
+                });
+            };
+            
+            panoramaManager.init();
+        }
+    });
 
-    <script src="script.js"></script>
+    window.addEventListener('load', () => {
+        const loader = document.querySelector('.loader');
+        setTimeout(() => {
+            loader.classList.add('hidden');
+            document.body.style.opacity = '1';
+        }, 2000);
+
+        const revealElements = document.querySelectorAll('.reveal');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+        revealElements.forEach(el => observer.observe(el));
+    });
+    </script>
+
 </body>
 </html>
