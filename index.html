@@ -373,6 +373,8 @@
                 
                 // 直接パノラマを読み込み
                 const viewer = new PanoramaViewer(viewerElement.id, imageUrl);
+                // わずかに遅延させてリサイズを実行し、コンテナのサイズを正しく反映させる
+                setTimeout(() => viewer.onWindowResize(), 50);
                 if (viewer) {
                     viewer.lon = 180;
                     this.viewers.set(viewerElement.id, viewer);
