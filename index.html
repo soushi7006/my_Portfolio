@@ -10,8 +10,9 @@
     <meta name="twitter:card" content="summary_large_image">
     
     <link rel="icon" href="data:,">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="panorama.js"></script>
+    <link rel="preload" href="images/IMG_20250607_210405_00_013-4【完成】.jpg" as="image" media="(min-width: 769px)">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
+    <script src="panorama.js" defer></script>
 
     <style>
         /* ▼▼▼ フォントと基本設定 ▼▼▼ */
@@ -118,9 +119,43 @@
         .gallery360 h2 { text-align: center; font-size: 2.8rem; margin-bottom: 4rem; }
         .panorama-gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2.5rem; }
         .panorama-item { padding: 1rem; }
-        .panorama-viewer { width: 100%; height: 250px; }
+        .panorama-viewer { width: 100%; height: 250px; position: relative; }
         .panorama-info { padding: 1.5rem 0 0; text-align: center; }
         .panorama-info h3 { font-size: 1.8rem; }
+        
+        /* スマホ最適化 */
+        .lazy-load-placeholder {
+            background: linear-gradient(45deg, #111, #222);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .lazy-load-placeholder:hover {
+            background: linear-gradient(45deg, #222, #333);
+            color: #aaa;
+        }
+        
+        /* モバイル用軽量化 */
+        @media (max-width: 768px) {
+            .panorama-gallery { grid-template-columns: 1fr; gap: 1.5rem; }
+            .panorama-viewer { height: 200px; }
+            .hero-content h2 { font-size: 2.5rem; }
+            
+            /* スマホでは3D処理を簡略化 */
+            #panorama-container { 
+                filter: brightness(0.6) contrast(1.1); 
+                will-change: transform;
+            }
+            
+            /* フォント読み込みを遅延 */
+            .hero-content h2, .about-text h2, .gallery360 h2, .social-links h2, .contact h2 {
+                font-display: swap;
+            }
+        }
 
         /* About Section */
         .about-content { display: grid; grid-template-columns: 2fr 1fr; gap: 4rem; align-items: center; }
@@ -174,9 +209,24 @@
             <div class="container">
                 <h2 class="reveal">360° PANORAMA GALLERY</h2>
                 <div class="panorama-gallery">
-                    <div class="panorama-item crystal-frame reveal"><div class="panorama-viewer" id="panorama1"></div><div class="panorama-info"><h3>工場夜景</h3></div></div>
-                    <div class="panorama-item crystal-frame reveal"><div class="panorama-viewer" id="panorama2"></div><div class="panorama-info"><h3>自然の風景</h3></div></div>
-                    <div class="panorama-item crystal-frame reveal"><div class="panorama-viewer" id="panorama3"></div><div class="panorama-info"><h3>歴史的な場所</h3></div></div>
+                    <div class="panorama-item crystal-frame reveal" data-lazy-panorama="images/IMG_20250727_042105_00_003-4end.jpg">
+                        <div class="panorama-viewer lazy-load-placeholder" id="panorama1">
+                            <span>🌅 クリックで360°ビューを読み込み</span>
+                        </div>
+                        <div class="panorama-info"><h3>工場夜景</h3></div>
+                    </div>
+                    <div class="panorama-item crystal-frame reveal" data-lazy-panorama="images/IMG_20250706_123058_00_023-5【完成】.jpg">
+                        <div class="panorama-viewer lazy-load-placeholder" id="panorama2">
+                            <span>🏞️ クリックで360°ビューを読み込み</span>
+                        </div>
+                        <div class="panorama-info"><h3>自然の風景</h3></div>
+                    </div>
+                    <div class="panorama-item crystal-frame reveal" data-lazy-panorama="images/IMG_20250705_131549_00_002-4【完成】.jpg">
+                        <div class="panorama-viewer lazy-load-placeholder" id="panorama3">
+                            <span>🏛️ クリックで360°ビューを読み込み</span>
+                        </div>
+                        <div class="panorama-info"><h3>歴史的な場所</h3></div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -230,37 +280,126 @@
     </footer>
 
     <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        // Panorama setup
-        if (typeof PanoramaManager !== 'undefined') {
-            const panoramaManager = new PanoramaManager();
-            panoramaManager.initHeroPanorama = function() {
-                if (!document.getElementById('panorama-container')) return;
-                this.currentHeroPanorama = this.createViewer('panorama-container', 'images/IMG_20250607_210405_00_013-4【完成】.jpg');
-                if(this.currentHeroPanorama) {
+    // 軽量版パノラママネージャー（遅延ローディング対応）
+    class LightweightPanoramaManager {
+        constructor() {
+            this.viewers = new Map();
+            this.loadedPanoramas = new Set();
+            this.isMobile = window.innerWidth <= 768;
+        }
+        
+        // ヒーロー用のパノラマを遅延初期化
+        initHeroPanorama() {
+            if (!document.getElementById('panorama-container') || typeof PanoramaViewer === 'undefined') return;
+            
+            // スマホの場合はさらに遅延して初期化
+            const initPanorama = () => {
+                const imageUrl = 'images/IMG_20250607_210405_00_013-4【完成】.jpg';
+                this.currentHeroPanorama = new PanoramaViewer('panorama-container', imageUrl);
+                if (this.currentHeroPanorama) {
                     this.currentHeroPanorama.lon = 180;
-                    this.currentHeroPanorama.startAutoRotation(0.05);
+                    if (!this.isMobile) {
+                        this.currentHeroPanorama.startAutoRotation(0.05);
+                    }
                 }
             };
             
-            panoramaManager.initGalleryPanoramas = function() {
-                const galleryItems = document.querySelectorAll('.panorama-item');
-                const panoramaImages = [
-                    'images/IMG_20250727_042105_00_003-4end.jpg',
-                    'images/IMG_20250706_123058_00_023-5【完成】.jpg',
-                    'images/IMG_20250705_131549_00_002-4【完成】.jpg'
-                ];
-                galleryItems.forEach((item, index) => {
-                    const viewerId = item.querySelector('.panorama-viewer').id;
-                    if (viewerId && panoramaImages[index]) {
-                        const viewer = this.createViewer(viewerId, panoramaImages[index]);
-                        if (viewer) viewer.lon = 180;
+            if (this.isMobile) {
+                // スマホの場合はユーザーがスクロールし始めたら読み込み
+                let scrolled = false;
+                const onScroll = () => {
+                    if (!scrolled && window.scrollY > 50) {
+                        scrolled = true;
+                        setTimeout(initPanorama, 300);
+                        window.removeEventListener('scroll', onScroll);
+                    }
+                };
+                window.addEventListener('scroll', onScroll);
+                // 3秒後に強制初期化
+                setTimeout(() => {
+                    if (!scrolled) {
+                        initPanorama();
+                        window.removeEventListener('scroll', onScroll);
+                    }
+                }, 3000);
+            } else {
+                initPanorama();
+            }
+        }
+        
+        // ギャラリーの遅延ローディング
+        initLazyGallery() {
+            const galleryItems = document.querySelectorAll('.panorama-item[data-lazy-panorama]');
+            
+            galleryItems.forEach((item) => {
+                const viewerElement = item.querySelector('.panorama-viewer');
+                const imageUrl = item.getAttribute('data-lazy-panorama');
+                
+                // クリックで読み込み
+                item.addEventListener('click', () => {
+                    if (!this.loadedPanoramas.has(viewerElement.id)) {
+                        this.loadPanoramaViewer(viewerElement, imageUrl);
+                        this.loadedPanoramas.add(viewerElement.id);
                     }
                 });
+                
+                // Intersection Observerで画面に入ったら自動読み込み（PCのみ）
+                if (!this.isMobile) {
+                    const observer = new IntersectionObserver((entries) => {
+                        entries.forEach(entry => {
+                            if (entry.isIntersecting && !this.loadedPanoramas.has(viewerElement.id)) {
+                                setTimeout(() => {
+                                    this.loadPanoramaViewer(viewerElement, imageUrl);
+                                    this.loadedPanoramas.add(viewerElement.id);
+                                    observer.unobserve(entry.target);
+                                }, 500);
+                            }
+                        });
+                    }, { rootMargin: '50px' });
+                    observer.observe(item);
+                }
+            });
+        }
+        
+        loadPanoramaViewer(viewerElement, imageUrl) {
+            viewerElement.classList.remove('lazy-load-placeholder');
+            viewerElement.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#999;">読み込み中...</div>';
+            
+            try {
+                const viewer = new PanoramaViewer(viewerElement.id, imageUrl);
+                if (viewer) {
+                    viewer.lon = 180;
+                    this.viewers.set(viewerElement.id, viewer);
+                }
+            } catch (error) {
+                console.warn('パノラマ読み込みエラー:', error);
+                viewerElement.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#666;">読み込みに失敗しました</div>';
+            }
+        }
+        
+        init() {
+            // Three.jsとPanoramaViewerが読み込まれるまで待機
+            const checkDependencies = () => {
+                if (typeof THREE !== 'undefined' && typeof PanoramaViewer !== 'undefined') {
+                    this.initHeroPanorama();
+                    this.initLazyGallery();
+                } else {
+                    setTimeout(checkDependencies, 100);
+                }
             };
             
-            panoramaManager.init();
+            // スマホの場合は初期化をさらに遅延
+            if (this.isMobile) {
+                setTimeout(checkDependencies, 1000);
+            } else {
+                checkDependencies();
+            }
         }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const panoramaManager = new LightweightPanoramaManager();
+        panoramaManager.init();
     });
 
     window.addEventListener('load', () => {
@@ -268,7 +407,7 @@
         setTimeout(() => {
             loader.classList.add('hidden');
             document.body.style.opacity = '1';
-        }, 2000);
+        }, 1500); // ローディング時間を短縮
 
         const revealElements = document.querySelectorAll('.reveal');
         const observer = new IntersectionObserver((entries) => {
