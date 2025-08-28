@@ -341,7 +341,9 @@
                 const imageUrl = item.getAttribute('data-lazy-panorama');
                 
                 // クリックで読み込み
-                item.addEventListener('click', () => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    console.log('ギャラリーアイテムクリック:', viewerElement.id, imageUrl);
                     if (!this.loadedPanoramas.has(viewerElement.id)) {
                         this.loadPanoramaViewer(viewerElement, imageUrl);
                         this.loadedPanoramas.add(viewerElement.id);
@@ -371,14 +373,34 @@
             viewerElement.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#999;">読み込み中...</div>';
             
             try {
-                const viewer = new PanoramaViewer(viewerElement.id, imageUrl);
-                if (viewer) {
+                // コンテナのサイズを確定する
+                const rect = viewerElement.getBoundingClientRect();
+                if (rect.width === 0 || rect.height === 0) {
+                    setTimeout(() => this.loadPanoramaViewer(viewerElement, imageUrl), 100);
+                    return;
+                }
+                
+                console.log('パノラマ読み込み開始:', imageUrl);
+                const viewer = new PanoramaViewer(viewerElement.id);
+                
+                // 最初にデフォルトスカイボックスを作成
+                viewer.createDefaultSkybox();
+                
+                // その後でパノラマ読み込み
+                setTimeout(() => {
+                    viewer.loadPanorama(imageUrl);
                     viewer.lon = 180;
                     this.viewers.set(viewerElement.id, viewer);
-                }
+                }, 500);
+                
             } catch (error) {
-                console.warn('パノラマ読み込みエラー:', error);
-                viewerElement.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#666;">読み込みに失敗しました</div>';
+                console.error('パノラマ読み込みエラー:', error);
+                viewerElement.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#666;font-size:0.8rem;text-align:center;padding:10px;">読み込みに失敗しました<br><small>クリックで再試行</small></div>';
+                
+                // 再試行機能を追加
+                viewerElement.addEventListener('click', () => {
+                    this.loadPanoramaViewer(viewerElement, imageUrl);
+                });
             }
         }
         
@@ -397,7 +419,8 @@
             if (this.isMobile) {
                 setTimeout(checkDependencies, 1000);
             } else {
-                checkDependencies();
+                // PCでも少し遅延してThree.jsの完全初期化を待つ
+                setTimeout(checkDependencies, 200);
             }
         }
     }
