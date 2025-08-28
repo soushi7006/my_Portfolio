@@ -213,9 +213,9 @@
                 <h2 class="reveal">360° PANORAMA GALLERY</h2>
                 <div class="panorama-gallery">
                     <div class="panorama-item crystal-frame reveal" data-lazy-panorama="images/IMG_20250727_042105_00_003-4end.jpg">
-                        <div class="panorama-viewer lazy-load-placeholder" id="panorama1">
-                            <span>🌅 クリックで360°ビューを読み込み</span>
-                        </div>
+                        <div class="panorama-viewer" id="panorama1">
+                            <img src="images/IMG_20250727_042105_00_003-4end.jpg" alt="工場夜景の360°写真" style="width:100%; height:100%; object-fit:cover;">
+                            </div>
                         <div class="panorama-info"><h3>工場夜景</h3></div>
                     </div>
                     <div class="panorama-item crystal-frame reveal" data-lazy-panorama="images/IMG_20250706_123058_00_023-5【完成】.jpg">
@@ -332,84 +332,109 @@
             }
         }
         
-        // ギャラリーの遅延ローディング
-        initLazyGallery() {
+       // ▼▼▼ ここからギャラリー用のスクリプト ▼▼▼
+    class FullscreenPanoramaManager {
+        constructor() {
+            this.currentViewer = null;
+            this.fullscreenContainer = null;
+        }
+
+        // ギャラリーアイテムにクリックイベントを設定
+        initGallery() {
             const galleryItems = document.querySelectorAll('.panorama-item[data-lazy-panorama]');
             
-            galleryItems.forEach((item) => {
-                const viewerElement = item.querySelector('.panorama-viewer');
-                const imageUrl = item.getAttribute('data-lazy-panorama');
-                
-                // クリックで読み込み
+            galleryItems.forEach(item => {
                 item.addEventListener('click', (e) => {
                     e.preventDefault();
-                    console.log('ギャラリーアイテムクリック:', viewerElement.id, imageUrl);
-                    if (!this.loadedPanoramas.has(viewerElement.id)) {
-                        this.loadPanoramaViewer(viewerElement, imageUrl);
-                        this.loadedPanoramas.add(viewerElement.id);
+                    const imageUrl = item.getAttribute('data-lazy-panorama');
+                    if (imageUrl) {
+                        this.open(imageUrl);
                     }
                 });
-                
-                // PCでもクリック時のみ読み込みに変更（競合状態を回避）
-                // 自動読み込みは無効化
-                console.log('ギャラリーアイテム初期化:', viewerElement.id);
             });
         }
-        
-        loadPanoramaViewer(viewerElement, imageUrl) {
-            viewerElement.classList.remove('lazy-load-placeholder');
-            viewerElement.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#999;font-size:0.9rem;">🔄 読み込み中...</div>';
-            
-                  // ビューワーの作成処理そのものを少し遅延させる
-                  setTimeout(() => {
-                try {
-                    console.log('パノラマビューアー作成開始:', viewerElement.id, imageUrl);
-                    
-                    // 直接パノラマを読み込み
-                    const viewer = new PanoramaViewer(viewerElement.id, imageUrl);
 
-                    if (viewer) {
-                        viewer.lon = 180;
-                        this.viewers.set(viewerElement.id, viewer);
-                        console.log('パノラマビューアー作成完了:', viewerElement.id);
-                    }
-                    
-                } catch (error) {
-                    console.error('パノラマ読み込みエラー:', error);
-                    viewerElement.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#666;font-size:0.8rem;text-align:center;padding:10px;cursor:pointer;">⚠️ 読み込みエラー<br><small>クリックで再試行</small></div>';
-                    
-                    viewerElement.onclick = () => {
-                        this.loadedPanoramas.delete(viewerElement.id);
-                        this.loadPanoramaViewer(viewerElement, imageUrl);
-                    };
-                }
-            }, 100); // 100ミリ秒待ってから実行
-        }
-        
-        init() {
-            // Three.jsとPanoramaViewerが読み込まれるまで待機
-            const checkDependencies = () => {
-                if (typeof THREE !== 'undefined' && typeof PanoramaViewer !== 'undefined') {
-                    this.initHeroPanorama();
-                    this.initLazyGallery();
-                } else {
-                    setTimeout(checkDependencies, 100);
-                }
-            };
-            
-            // スマホの場合は初期化をさらに遅延
-            if (this.isMobile) {
-                setTimeout(checkDependencies, 1000);
-            } else {
-                // PCでも少し遅延してThree.jsの完全初期化を待つ
-                setTimeout(checkDependencies, 200);
+        // フルスクリーンで360°ビューワーを開く
+        open(imageUrl) {
+            // 既存のビューワーがあれば閉じる
+            if (this.fullscreenContainer) {
+                this.close();
             }
+
+            // --- ここから script.js の openPanorama と同じような処理 ---
+            
+            // フルスクリーン用のコンテナを作成
+            this.fullscreenContainer = document.createElement('div');
+            this.fullscreenContainer.id = 'fullscreen-panorama-container';
+            this.fullscreenContainer.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.9);
+                z-index: 9999;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            `;
+
+            // 閉じるボタンを作成
+            const closeButton = document.createElement('button');
+            closeButton.textContent = '✕ 閉じる';
+            closeButton.style.cssText = `
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                z-index: 10000;
+                background: rgba(0,0,0,0.5);
+                color: white;
+                border: 1px solid white;
+                padding: 10px 15px;
+                border-radius: 5px;
+                cursor: pointer;
+            `;
+            closeButton.onclick = () => this.close();
+
+            this.fullscreenContainer.appendChild(closeButton);
+            document.body.appendChild(this.fullscreenContainer);
+            document.body.style.overflow = 'hidden';
+
+            // ビューワーを初期化
+            this.currentViewer = new PanoramaViewer('fullscreen-panorama-container', imageUrl);
+
+            // 表示アニメーション
+            setTimeout(() => {
+                this.fullscreenContainer.style.opacity = '1';
+            }, 10);
+        }
+
+        // フルスクリーンを閉じる
+        close() {
+            if (!this.fullscreenContainer) return;
+
+            // currentViewerのインスタンスを破棄（メモリ解放）
+            if (this.currentViewer && typeof this.currentViewer.destroy === 'function') {
+                this.currentViewer.destroy();
+                this.currentViewer = null;
+            }
+            
+            this.fullscreenContainer.style.opacity = '0';
+            setTimeout(() => {
+                document.body.removeChild(this.fullscreenContainer);
+                this.fullscreenContainer = null;
+                document.body.style.overflow = 'auto';
+            }, 300);
         }
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+        // ヒーロー用のパノラママネージャーを初期化
         const panoramaManager = new LightweightPanoramaManager();
         panoramaManager.init();
+
+        // ギャラリー用の新しいマネージャーを初期化
+        const galleryManager = new FullscreenPanoramaManager();
+        galleryManager.initGallery();
     });
 
     window.addEventListener('load', () => {
