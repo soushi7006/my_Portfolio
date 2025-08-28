@@ -13,7 +13,7 @@
     <meta name="twitter:card" content="summary_large_image">
     
     <link rel="icon" href="data:,">
-    <link rel="preload" href="images/IMG_20250607_210405_00_013-4【完成】.jpg" as="image" media="(min-width: 769px)">
+    <link rel="preload" href="images/IMG_20250607_210405_00_013-4【完成】.jpg" as="image" crossorigin="anonymous">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
     <script src="panorama.js" defer></script>
 
@@ -350,57 +350,44 @@
                     }
                 });
                 
-                // Intersection Observerで画面に入ったら自動読み込み（PCのみ）
-                if (!this.isMobile) {
-                    const observer = new IntersectionObserver((entries) => {
-                        entries.forEach(entry => {
-                            if (entry.isIntersecting && !this.loadedPanoramas.has(viewerElement.id)) {
-                                setTimeout(() => {
-                                    this.loadPanoramaViewer(viewerElement, imageUrl);
-                                    this.loadedPanoramas.add(viewerElement.id);
-                                    observer.unobserve(entry.target);
-                                }, 500);
-                            }
-                        });
-                    }, { rootMargin: '50px' });
-                    observer.observe(item);
-                }
+                // PCでもクリック時のみ読み込みに変更（競合状態を回避）
+                // 自動読み込みは無効化
+                console.log('ギャラリーアイテム初期化:', viewerElement.id);
             });
         }
         
         loadPanoramaViewer(viewerElement, imageUrl) {
             viewerElement.classList.remove('lazy-load-placeholder');
-            viewerElement.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#999;">読み込み中...</div>';
+            viewerElement.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#999;font-size:0.9rem;">🔄 読み込み中...</div>';
             
             try {
                 // コンテナのサイズを確定する
                 const rect = viewerElement.getBoundingClientRect();
                 if (rect.width === 0 || rect.height === 0) {
-                    setTimeout(() => this.loadPanoramaViewer(viewerElement, imageUrl), 100);
+                    console.warn('コンテナサイズが0のためリトライ:', viewerElement.id);
+                    setTimeout(() => this.loadPanoramaViewer(viewerElement, imageUrl), 200);
                     return;
                 }
                 
-                console.log('パノラマ読み込み開始:', imageUrl);
-                const viewer = new PanoramaViewer(viewerElement.id);
+                console.log('パノラマビューアー作成開始:', viewerElement.id, imageUrl);
                 
-                // 最初にデフォルトスカイボックスを作成
-                viewer.createDefaultSkybox();
-                
-                // その後でパノラマ読み込み
-                setTimeout(() => {
-                    viewer.loadPanorama(imageUrl);
+                // 直接パノラマを読み込み
+                const viewer = new PanoramaViewer(viewerElement.id, imageUrl);
+                if (viewer) {
                     viewer.lon = 180;
                     this.viewers.set(viewerElement.id, viewer);
-                }, 500);
+                    console.log('パノラマビューアー作成完了:', viewerElement.id);
+                }
                 
             } catch (error) {
                 console.error('パノラマ読み込みエラー:', error);
-                viewerElement.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#666;font-size:0.8rem;text-align:center;padding:10px;">読み込みに失敗しました<br><small>クリックで再試行</small></div>';
+                viewerElement.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#666;font-size:0.8rem;text-align:center;padding:10px;cursor:pointer;">⚠️ 読み込みエラー<br><small>クリックで再試行</small></div>';
                 
                 // 再試行機能を追加
-                viewerElement.addEventListener('click', () => {
+                viewerElement.onclick = () => {
+                    this.loadedPanoramas.delete(viewerElement.id);
                     this.loadPanoramaViewer(viewerElement, imageUrl);
-                });
+                };
             }
         }
         
