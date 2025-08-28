@@ -360,37 +360,30 @@
             viewerElement.classList.remove('lazy-load-placeholder');
             viewerElement.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#999;font-size:0.9rem;">🔄 読み込み中...</div>';
             
-            try {
-                // コンテナのサイズを確定する
-                const rect = viewerElement.getBoundingClientRect();
-                if (rect.width === 0 || rect.height === 0) {
-                    console.warn('コンテナサイズが0のためリトライ:', viewerElement.id);
-                    setTimeout(() => this.loadPanoramaViewer(viewerElement, imageUrl), 200);
-                    return;
+                  // ビューワーの作成処理そのものを少し遅延させる
+                  setTimeout(() => {
+                try {
+                    console.log('パノラマビューアー作成開始:', viewerElement.id, imageUrl);
+                    
+                    // 直接パノラマを読み込み
+                    const viewer = new PanoramaViewer(viewerElement.id, imageUrl);
+
+                    if (viewer) {
+                        viewer.lon = 180;
+                        this.viewers.set(viewerElement.id, viewer);
+                        console.log('パノラマビューアー作成完了:', viewerElement.id);
+                    }
+                    
+                } catch (error) {
+                    console.error('パノラマ読み込みエラー:', error);
+                    viewerElement.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#666;font-size:0.8rem;text-align:center;padding:10px;cursor:pointer;">⚠️ 読み込みエラー<br><small>クリックで再試行</small></div>';
+                    
+                    viewerElement.onclick = () => {
+                        this.loadedPanoramas.delete(viewerElement.id);
+                        this.loadPanoramaViewer(viewerElement, imageUrl);
+                    };
                 }
-                
-                console.log('パノラマビューアー作成開始:', viewerElement.id, imageUrl);
-                
-                // 直接パノラマを読み込み
-                const viewer = new PanoramaViewer(viewerElement.id, imageUrl);
-                // わずかに遅延させてリサイズを実行し、コンテナのサイズを正しく反映させる
-                setTimeout(() => viewer.onWindowResize(), 50);
-                if (viewer) {
-                    viewer.lon = 180;
-                    this.viewers.set(viewerElement.id, viewer);
-                    console.log('パノラマビューアー作成完了:', viewerElement.id);
-                }
-                
-            } catch (error) {
-                console.error('パノラマ読み込みエラー:', error);
-                viewerElement.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#666;font-size:0.8rem;text-align:center;padding:10px;cursor:pointer;">⚠️ 読み込みエラー<br><small>クリックで再試行</small></div>';
-                
-                // 再試行機能を追加
-                viewerElement.onclick = () => {
-                    this.loadedPanoramas.delete(viewerElement.id);
-                    this.loadPanoramaViewer(viewerElement, imageUrl);
-                };
-            }
+            }, 100); // 100ミリ秒待ってから実行
         }
         
         init() {
