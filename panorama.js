@@ -100,6 +100,7 @@ class PanoramaViewer {
 
                 this.sphere = new THREE.Mesh(geometry, material);
                 this.scene.add(this.sphere);
+                this.onWindowResize(); 
             },
             (progress) => {
                 console.log('Loading progress:', (progress.loaded / progress.total * 100) + '%');
