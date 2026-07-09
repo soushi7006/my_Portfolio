@@ -13,6 +13,9 @@ class PanoramaViewer {
         this.lat = 0;
         this.phi = 0;
         this.theta = 0;
+        this.animationFrameId = null;
+        this.autoRotationFrameId = null;
+        this.isDestroyed = false;
         
         this.init();
         if (imageUrl) {
@@ -204,9 +207,8 @@ class PanoramaViewer {
         });
 
         // Resize event
-        window.addEventListener('resize', () => {
-            this.onWindowResize();
-        });
+        this.handleResize = () => this.onWindowResize();
+        window.addEventListener('resize', this.handleResize);
     }
 
     onWindowResize() {
@@ -219,7 +221,8 @@ class PanoramaViewer {
     }
 
     animate() {
-        requestAnimationFrame(() => this.animate());
+        if (this.isDestroyed) return;
+        this.animationFrameId = requestAnimationFrame(() => this.animate());
 
         // Update camera position based on mouse movement
         this.phi = THREE.MathUtils.degToRad(90 - this.lat);
@@ -246,13 +249,13 @@ class PanoramaViewer {
     }
 
     autoRotateAnimation() {
-        if (!this.autoRotate) return;
+        if (!this.autoRotate || this.isDestroyed) return;
         
         if (!this.isMouseDown) {
             this.lon += this.autoRotationSpeed;
         }
         
-        requestAnimationFrame(() => this.autoRotateAnimation());
+        this.autoRotationFrameId = requestAnimationFrame(() => this.autoRotateAnimation());
     }
 
     // Method to change panorama
@@ -270,8 +273,23 @@ class PanoramaViewer {
 
     // Clean up
     destroy() {
+        this.isDestroyed = true;
+        this.autoRotate = false;
+        if (this.animationFrameId) {
+            cancelAnimationFrame(this.animationFrameId);
+            this.animationFrameId = null;
+        }
+        if (this.autoRotationFrameId) {
+            cancelAnimationFrame(this.autoRotationFrameId);
+            this.autoRotationFrameId = null;
+        }
+        if (this.handleResize) {
+            window.removeEventListener('resize', this.handleResize);
+        }
         if (this.renderer) {
-            this.container.removeChild(this.renderer.domElement);
+            if (this.renderer.domElement && this.renderer.domElement.parentNode === this.container) {
+                this.container.removeChild(this.renderer.domElement);
+            }
             this.renderer.dispose();
         }
         if (this.sphere && this.sphere.material) {

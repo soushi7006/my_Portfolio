@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0">
     <title>結城／全景ポータリスト</title>
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
@@ -22,12 +22,15 @@
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500&family=Noto+Sans+JP:wght@300;400;700&display=swap');
 
         :root {
-            --base-bg: #000000;
-            --content-bg: #111;
-            --text-main: #e0e0e0;
-            --crystal-border: #E7F0FF;
-            --neon-blue: #00e1ff;
-            --neon-yellow: #fff700;
+            --base-bg: #0a0b0d;
+            --content-bg: #101216;
+            --text-main: #e6e8ec;
+            --text-sub: #9aa3ad;
+            --crystal-border: #cfe0f5;
+            /* アクセントは1色系に統一（青×黄の競合をやめて“まとまり”を出す） */
+            --accent: #7fc9ff;
+            --neon-blue: #7fc9ff;
+            --neon-yellow: #7fc9ff;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -40,6 +43,10 @@
             overflow-x: hidden;
             opacity: 0;
             transition: opacity 0.5s ease;
+            background:
+                radial-gradient(circle at top left, rgba(127, 201, 255, 0.14), transparent 32rem),
+                radial-gradient(circle at bottom right, rgba(231, 240, 255, 0.08), transparent 36rem),
+                var(--base-bg);
         }
         
         /* ▼▼▼ ローディングアニメーション ▼▼▼ */
@@ -61,6 +68,7 @@
         .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
         h1, h2, h3, h4 { font-family: 'Rajdhani', sans-serif; font-weight: 500; color: #ffffff; }
         section { padding: 120px 0; position: relative; z-index: 1; }
+        p { color: var(--text-sub); line-height: 1.9; }
 
         .reveal { opacity: 0; transform: translateY(30px); transition: opacity 1s ease, transform 1s ease; }
         .reveal.visible { opacity: 1; transform: translateY(0); }
@@ -75,32 +83,114 @@
         .nav-container { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; }
         .logo h1 { font-family: 'Orbitron', sans-serif; font-size: 1.8rem; }
         .nav-menu { display: flex; list-style: none; gap: 2rem; }
-        .nav-menu a { color: var(--text-main); text-decoration: none; transition: all 0.3s ease; }
+        .nav-menu a { color: var(--text-main); text-decoration: none; transition: all 0.3s ease; min-height: 44px; display: flex; align-items: center; }
         .nav-menu a:hover { color: var(--crystal-border); text-shadow: 0 0 8px var(--crystal-border); }
+        
+        /* ハンバーガーメニュー */
+        .hamburger { display: none; flex-direction: column; cursor: pointer; padding: 8px; }
+        .hamburger span { width: 25px; height: 3px; background: var(--text-main); margin: 3px 0; transition: 0.3s; border-radius: 2px; }
+        
+        .hamburger.active span:nth-child(1) { transform: rotate(-45deg) translate(-5px, 6px); }
+        .hamburger.active span:nth-child(2) { opacity: 0; }
+        .hamburger.active span:nth-child(3) { transform: rotate(45deg) translate(-5px, -6px); }
 
         /* Hero Section */
         .hero { height: 100vh; position: relative; display: flex; align-items: center; justify-content: center; text-align: center; }
-        #panorama-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; filter: brightness(0.6); }
-        .hero-content h2 { font-family: 'Orbitron', sans-serif; font-size: 3.5rem; text-shadow: 0 0 10px rgba(231, 240, 255, 0.7); }
-        .hero-content p { font-size: 1.2rem; margin-top: 1rem; }
+        .hero::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background:
+                linear-gradient(180deg, rgba(10,11,13,0.15) 0%, rgba(10,11,13,0.2) 45%, var(--base-bg) 100%),
+                radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.35) 75%);
+        }
+        #panorama-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; filter: brightness(0.62) saturate(0.85); }
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            padding: 2.5rem;
+            max-width: 900px;
+        }
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: .6rem;
+            color: var(--accent);
+            letter-spacing: .18em;
+            font-size: .82rem;
+            margin-bottom: 1.4rem;
+            text-transform: uppercase;
+        }
+        .eyebrow::before, .eyebrow::after {
+            content: "";
+            display: block;
+            width: 2.5rem;
+            height: 1px;
+            background: rgba(127, 201, 255, .55);
+        }
+        .hero-content h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(2.6rem, 7vw, 5.8rem);
+            line-height: 1.05;
+            letter-spacing: .03em;
+            text-shadow: 0 0 28px rgba(127, 201, 255, 0.35);
+        }
+        .hero-content p { font-size: clamp(1rem, 2vw, 1.35rem); margin-top: 1.3rem; color: #f0f4f8; }
+        .hero-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 48px;
+            padding: .85rem 1.3rem;
+            border-radius: 999px;
+            text-decoration: none;
+            color: #fff;
+            border: 1px solid rgba(207, 224, 245, .45);
+            background: rgba(16, 18, 22, .52);
+            backdrop-filter: blur(10px);
+            transition: transform .25s ease, background .25s ease, border-color .25s ease;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            background: rgba(127, 201, 255, .16);
+            border-color: var(--accent);
+        }
+        .btn.primary {
+            background: linear-gradient(135deg, rgba(127,201,255,.92), rgba(54,127,185,.82));
+            border-color: transparent;
+            color: #071018;
+            font-weight: 700;
+        }
 
         /* クリスタル・フレーム共通スタイル */
         .crystal-frame {
-            background: rgba(0,0,0,0.5);
-            border: 2px solid var(--crystal-border);
-            box-shadow: 0 0 20px rgba(231, 240, 255, 0.3), inset 0 0 15px rgba(231, 240, 255, 0.2);
+            background: linear-gradient(180deg, rgba(255,255,255,0.055), rgba(255,255,255,0.025));
+            border: 1px solid rgba(207, 224, 245, .28);
+            border-radius: 24px;
+            box-shadow: 0 18px 55px rgba(0, 0, 0, 0.34), inset 0 1px 0 rgba(255,255,255,.08);
             position: relative;
             overflow: hidden;
             cursor: pointer;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
+            backdrop-filter: blur(8px);
         }
         .crystal-frame:hover {
-            transform: translateY(-5px) scale(1.02);
-            box-shadow: 0 10px 40px rgba(231, 240, 255, 0.5), inset 0 0 20px rgba(231, 240, 255, 0.3);
+            transform: translateY(-6px);
+            box-shadow: 0 28px 70px rgba(0, 0, 0, 0.48), 0 0 32px rgba(127, 201, 255, 0.16), inset 0 1px 0 rgba(255,255,255,.12);
+            border-color: rgba(127, 201, 255, .55);
         }
         /* ネオンエフェクト共通スタイル */
         .crystal-frame::before, .crystal-frame::after {
-            content: ''; position: absolute; width: 150%; height: 3px;
+            content: ''; position: absolute; width: 150%; height: 2px;
             pointer-events: none; filter: drop-shadow(0 0 5px currentColor);
         }
         .crystal-frame::before {
@@ -122,9 +212,37 @@
         .gallery360 h2 { text-align: center; font-size: 2.8rem; margin-bottom: 4rem; }
         .panorama-gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2.5rem; }
         .panorama-item { padding: 1rem; }
-        .panorama-viewer { width: 100%; height: 250px; position: relative; }
+        .panorama-viewer {
+            width: 100%;
+            height: 250px;
+            position: relative;
+            border-radius: 18px;
+            overflow: hidden;
+            background: #050607;
+        }
+        .panorama-viewer::after {
+            content: "DRAG / 360°";
+            position: absolute;
+            right: 14px;
+            bottom: 14px;
+            padding: .42rem .65rem;
+            border-radius: 999px;
+            color: #061018;
+            font-size: .75rem;
+            letter-spacing: .08em;
+            background: rgba(127, 201, 255, .88);
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+        }
+        .panorama-viewer img { transition: transform .45s ease, filter .45s ease; }
+        .panorama-item:hover .panorama-viewer img { transform: scale(1.04); filter: brightness(1.08); }
         .panorama-info { padding: 1.5rem 0 0; text-align: center; }
         .panorama-info h3 { font-size: 1.8rem; }
+        .section-lead {
+            max-width: 720px;
+            margin: -2.5rem auto 3.5rem;
+            text-align: center;
+        }
         
         /* スマホ最適化 */
         .lazy-load-placeholder {
@@ -144,9 +262,46 @@
         
         /* モバイル用軽量化 */
         @media (max-width: 768px) {
+            .hamburger { display: flex; }
+            
+            .nav-menu {
+                position: fixed;
+                left: -100%;
+                top: 80px;
+                flex-direction: column;
+                background-color: rgba(0,0,0,0.95);
+                width: 100%;
+                text-align: center;
+                transition: 0.3s;
+                box-shadow: 0 10px 27px rgba(0, 0, 0, 0.5);
+                padding: 2rem 0;
+                backdrop-filter: blur(10px);
+                z-index: 1001;
+            }
+            
+            .nav-menu.active { left: 0; }
+            
+            .nav-menu li { margin: 1rem 0; }
+            .nav-menu a {
+                font-size: 1.2rem;
+                padding: 1rem;
+                display: block;
+                min-height: 60px;
+            }
+            
             .panorama-gallery { grid-template-columns: 1fr; gap: 1.5rem; }
-            .panorama-viewer { height: 200px; }
-            .hero-content h2 { font-size: 2.5rem; }
+            .panorama-viewer { height: 220px; }
+            .hero-content { padding: 2rem 1rem; margin: 0 1rem; }
+            .hero-content h2 { font-size: 2.2rem; line-height: 1.2; }
+            .hero-content p { font-size: 1.1rem; line-height: 1.4; }
+            .hero-actions { gap: .75rem; }
+            .btn { width: min(100%, 280px); }
+            .streetview-wrap { grid-template-columns: 1fr; }
+            .streetview-frame, .streetview-frame iframe, .embed-placeholder { min-height: 340px; }
+            
+            /* タッチ操作を考慮したボタンサイズ */
+            .crystal-frame { min-height: 44px; }
+            .contact-sns-item { min-height: 64px; padding: 1rem; }
             
             /* スマホでは3D処理を簡略化 */
             #panorama-container { 
@@ -159,12 +314,95 @@
                 font-display: swap;
             }
         }
+        
+        /* より小さなスマホ画面 */
+        @media (max-width: 480px) {
+            .nav-container { padding: 1rem; }
+            .logo h1 { font-size: 1.5rem; }
+            
+            .hero-content h2 { font-size: 1.8rem; }
+            .hero-content p { font-size: 1rem; }
+            
+            .panorama-viewer { height: 180px; }
+            
+            .gallery360 h2, .about-text h2, .social-links h2, .contact h2 {
+                font-size: 2rem;
+            }
+            .streetview h2 { font-size: 2rem; }
+            .section-lead { margin-top: -2rem; }
+            
+            .about-content { grid-template-columns: 1fr; text-align: center; }
+            .social-grid { grid-template-columns: 1fr; }
+            .social-item { flex-direction: column; text-align: center; gap: 1rem; padding: 1.5rem; }
+            
+            .contact-sns-item {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+        }
 
         /* About Section */
         .about-content { display: grid; grid-template-columns: 2fr 1fr; gap: 4rem; align-items: center; }
         .about-text h2 { font-size: 2.8rem; margin-bottom: 2rem; }
         .about-image { display: flex; flex-direction: column; gap: 1.5rem; }
         .about-image img { width: 100%; display: block; }
+
+        /* Google Street View */
+        .streetview h2 { text-align: center; font-size: 2.8rem; margin-bottom: 1.25rem; }
+        .streetview-wrap {
+            display: grid;
+            grid-template-columns: minmax(0, 1.35fr) minmax(280px, .65fr);
+            gap: 2rem;
+            align-items: stretch;
+            margin-top: 3rem;
+        }
+        .streetview-frame {
+            min-height: 460px;
+            padding: 0;
+            cursor: default;
+        }
+        .streetview-frame iframe {
+            width: 100%;
+            height: 100%;
+            min-height: 460px;
+            border: 0;
+            display: block;
+            filter: saturate(.95) contrast(1.04);
+        }
+        .streetview-note {
+            padding: 2rem;
+            cursor: default;
+        }
+        .streetview-frame:hover,
+        .streetview-note:hover {
+            transform: none;
+        }
+        .streetview-note h3 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        .streetview-note ol {
+            color: var(--text-sub);
+            line-height: 1.9;
+            padding-left: 1.3rem;
+        }
+        .streetview-note strong { color: #fff; }
+        .embed-placeholder {
+            height: 100%;
+            min-height: 460px;
+            display: grid;
+            place-items: center;
+            text-align: center;
+            padding: 2rem;
+            background:
+                linear-gradient(rgba(8, 10, 13, .6), rgba(8, 10, 13, .75)),
+                radial-gradient(circle at center, rgba(127,201,255,.18), transparent 32rem);
+        }
+        .embed-placeholder p {
+            max-width: 520px;
+            margin: .8rem auto 0;
+        }
 
         /* Social Links */
         .social-links h2 { text-align: center; font-size: 2.8rem; margin-bottom: 4rem; }
@@ -179,6 +417,34 @@
         .contact-sns-item:hover { background: var(--crystal-border); color: var(--base-bg); box-shadow: 0 0 20px var(--crystal-border); }
 
         footer { text-align: center; color: #777; border-top: 1px solid #333; padding-top: 4rem; }
+
+        /* 最終レスポンシブ調整：後から定義されたPC用CSSより優先させる */
+        @media (max-width: 768px) {
+            section { padding: 88px 0; }
+            .about-content,
+            .streetview-wrap {
+                grid-template-columns: 1fr;
+            }
+            .streetview-frame,
+            .streetview-frame iframe,
+            .embed-placeholder {
+                min-height: 340px;
+            }
+            .streetview h2,
+            .gallery360 h2,
+            .about-text h2,
+            .social-links h2,
+            .contact h2 {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container { padding: 0 16px; }
+            .hero-content { padding: 1.5rem .5rem; }
+            .hero-actions { align-items: center; flex-direction: column; }
+            .streetview-note { padding: 1.4rem; }
+        }
     </style>
 </head>
 <body>
@@ -188,14 +454,20 @@
     <header>
         <nav class="container">
             <div class="logo"><h1>結城</h1></div>
-            <ul class="nav-menu">
+            <ul class="nav-menu" id="nav-menu">
                 <li><a href="#home">ホーム</a></li>
                 <li><a href="#gallery360">360°ギャラリー</a></li>
+                <li><a href="#streetview">ストリートビュー</a></li>
                 <li><a href="gallery.html">フォトギャラリー</a></li>
                 <li><a href="#about">プロフィール</a></li>
                 <li><a href="#social">SNS</a></li>
                 <li><a href="#contact">お問い合わせ</a></li>
             </ul>
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
         </nav>
     </header>
 
@@ -203,34 +475,71 @@
         <section id="home" class="hero">
             <div id="panorama-container"></div>
             <div class="hero-content reveal">
+                <div class="eyebrow">360° Photographer</div>
                 <h2>まるごと“切り撮る”</h2>
                 <p>没入感のある360度写真で<br>その場にいるような体験を</p>
+                <div class="hero-actions">
+                    <a href="#gallery360" class="btn primary">360°写真を見る</a>
+                    <a href="#streetview" class="btn">Googleストリートビュー</a>
+                </div>
             </div>
         </section>
 
         <section id="gallery360" class="gallery360">
             <div class="container">
                 <h2 class="reveal">360° PANORAMA GALLERY</h2>
+                <p class="section-lead reveal">平面写真では伝わりきらない、空気・距離感・視線の動きをそのまま残す。クリックするとフルスクリーンで360°写真を体験できます。</p>
                 <div class="panorama-gallery">
                     <div class="panorama-item crystal-frame reveal" data-lazy-panorama="images/IMG_20250727_042105_00_003-4end.jpg">
                         <div class="panorama-viewer" id="panorama1">
-                            <img src="images/IMG_20250727_042105_00_003-4end.jpg" alt="工場夜景の360°写真" style="width:100%; height:100%; object-fit:cover;">
+                            <img src="images/IMG_20250727_042105_00_003-4end.jpg" alt="工場夜景の360°写真" loading="lazy" decoding="async" style="width:100%; height:100%; object-fit:cover;">
                         </div>
                         <div class="panorama-info"><h3>工場夜景</h3></div>
                     </div>
                     
                     <div class="panorama-item crystal-frame reveal" data-lazy-panorama="images/IMG_20250706_123058_00_023-5【完成】.jpg">
                         <div class="panorama-viewer" id="panorama2">
-                            <img src="images/IMG_20250706_123058_00_023-5【完成】.jpg" alt="自然の風景の360°写真" style="width:100%; height:100%; object-fit:cover;">
+                            <img src="images/IMG_20250706_123058_00_023-5【完成】.jpg" alt="自然の風景の360°写真" loading="lazy" decoding="async" style="width:100%; height:100%; object-fit:cover;">
                         </div>
                         <div class="panorama-info"><h3>自然の風景</h3></div>
                     </div>
                     
                     <div class="panorama-item crystal-frame reveal" data-lazy-panorama="images/IMG_20250705_131549_00_002-4【完成】.jpg">
                         <div class="panorama-viewer" id="panorama3">
-                            <img src="images/IMG_20250705_131549_00_002-4【完成】.jpg" alt="歴史的な場所の360°写真" style="width:100%; height:100%; object-fit:cover;">
+                            <img src="images/IMG_20250705_131549_00_002-4【完成】.jpg" alt="歴史的な場所の360°写真" loading="lazy" decoding="async" style="width:100%; height:100%; object-fit:cover;">
                         </div>
                         <div class="panorama-info"><h3>歴史的な場所</h3></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="streetview" class="streetview">
+            <div class="container">
+                <h2 class="reveal">GOOGLE STREET VIEW</h2>
+                <p class="section-lead reveal">Googleマップ上の公開ストリートビューを、ホームページ内で直接見られるようにする枠です。公開後は撮影実績や店舗・施設紹介として使えます。</p>
+                <div class="streetview-wrap">
+                    <div class="streetview-frame crystal-frame reveal">
+                        <!--
+                            Googleストリートビュー埋め込みの差し替え場所です。
+                            Googleマップで対象地点を開く → 共有 → 地図を埋め込む → HTMLをコピー。
+                            下の <div class="embed-placeholder">...</div> を、コピーした <iframe ...></iframe> に置き換えてください。
+                        -->
+                        <div class="embed-placeholder">
+                            <div>
+                                <h3>Street View embed area</h3>
+                                <p>ここにGoogleマップの「地図を埋め込む」iframeを貼ると、サイト内でストリートビューを表示できます。</p>
+                                <p>実際のURLが分かれば、こちらで差し替えできます。</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="streetview-note crystal-frame reveal">
+                        <h3>載せ方のおすすめ</h3>
+                        <ol>
+                            <li><strong>APIキー不要：</strong>Googleマップの共有iframeを貼る方式が一番簡単です。</li>
+                            <li><strong>見せたい向き固定：</strong>ストリートビューで構図を決めてから「共有」すると、その視点で埋め込みやすいです。</li>
+                            <li><strong>作品として見せる：</strong>説明文・撮影場所・撮影意図を横に添えると、ただの地図ではなく実績になります。</li>
+                        </ol>
                     </div>
                 </div>
             </div>
@@ -382,8 +691,41 @@
         }
     }
 
+    // ハンバーガーメニューの動作
+    function initMobileMenu() {
+        const hamburger = document.getElementById('hamburger');
+        const navMenu = document.getElementById('nav-menu');
+        
+        if (hamburger && navMenu) {
+            hamburger.addEventListener('click', () => {
+                hamburger.classList.toggle('active');
+                navMenu.classList.toggle('active');
+                
+                // スクロールを無効化/有効化
+                if (navMenu.classList.contains('active')) {
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    document.body.style.overflow = 'auto';
+                }
+            });
+            
+            // メニューリンクをクリックしたらメニューを閉じる
+            const navLinks = navMenu.querySelectorAll('a');
+            navLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    hamburger.classList.remove('active');
+                    navMenu.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                });
+            });
+        }
+    }
+    
     // --- ページ全体の初期化処理 ---
     document.addEventListener('DOMContentLoaded', () => {
+        // モバイルメニューを初期化
+        initMobileMenu();
+        
         // ヒーロー用のパノラマ初期化
         // 注意：古いLightweightPanoramaManagerは使わない
         if (typeof PanoramaViewer !== 'undefined' && document.getElementById('panorama-container')) {
